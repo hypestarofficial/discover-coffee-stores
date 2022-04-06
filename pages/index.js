@@ -3,13 +3,29 @@ import Image from 'next/image';
 import Banner from '../components/banner.js';
 import Card from '../components/card.js';
 import styles from '../styles/Home.module.css';
-import coffeeStores from '../data/coffee-stores.json';
+import coffeeStoresData from '../data/coffee-stores.json';
 
-export async function getStaticProps(context) {
+export async function getStaticProps() {
   return {
-    props: { coffeeStores },
+    props: { coffeeStores: coffeeStoresData },
   };
 }
+
+const options = {
+  method: 'GET',
+  headers: {
+    Accept: 'application/json',
+    Authorization: 'fsq3L0NQixGnJgQnmdYrIASfNBkYSCB5yWtH5ElKDqbDl/k=',
+  },
+};
+
+fetch(
+  'https://api.foursquare.com/v3/places/search?query=coffee%20shop&ll=29.739113862858495%2C-95.36883114047225',
+  options
+)
+  .then((response) => response.json())
+  .then((response) => console.log(response))
+  .catch((err) => console.error(err));
 
 export default function Home(props) {
   const handleOnBannerBtnClick = () => {
@@ -31,19 +47,24 @@ export default function Home(props) {
         <div className={styles.heroImage}>
           <Image src='/static/hero-image.svg' width={700} height={400} />
         </div>
-        <div className={styles.cardLayout}>
-          {props.coffeeStores.map((coffeeStore) => {
-            return (
-              <Card
-                key={coffeeStore.id}
-                name={coffeeStore.name}
-                imgUrl={coffeeStore.imgUrl}
-                href={`/coffee-store/${coffeeStore.id}`}
-                className={styles.card}
-              />
-            );
-          })}
-        </div>
+        {props.coffeeStores && props.coffeeStores.length > 0 && (
+          <>
+            <h2 className={styles.heading2}>Toronto stores</h2>
+            <div className={styles.cardLayout}>
+              {props.coffeeStores.map((coffeeStore) => {
+                return (
+                  <Card
+                    key={coffeeStore.id}
+                    name={coffeeStore.name}
+                    imgUrl={coffeeStore.imgUrl}
+                    href={`/coffee-store/${coffeeStore.id}`}
+                    className={styles.card}
+                  />
+                );
+              })}
+            </div>
+          </>
+        )}
       </main>
     </div>
   );
