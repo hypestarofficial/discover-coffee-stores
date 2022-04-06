@@ -3,29 +3,28 @@ import Image from 'next/image';
 import Banner from '../components/banner.js';
 import Card from '../components/card.js';
 import styles from '../styles/Home.module.css';
-import coffeeStoresData from '../data/coffee-stores.json';
+// import coffeeStoresData from '../data/coffee-stores.json';
 
 export async function getStaticProps() {
+  const options = {
+    method: 'GET',
+    headers: {
+      Accept: 'application/json',
+      Authorization: 'fsq3L0NQixGnJgQnmdYrIASfNBkYSCB5yWtH5ElKDqbDl/k=',
+    },
+  };
+
+  const response = await fetch(
+    'https://api.foursquare.com/v3/places/search?ll=29.739113862858495%2C-95.36883114047225',
+    options
+  );
+  const data = await response.json();
+  console.log(data);
+
   return {
-    props: { coffeeStores: coffeeStoresData },
+    props: { coffeeStores: data.results },
   };
 }
-
-const options = {
-  method: 'GET',
-  headers: {
-    Accept: 'application/json',
-    Authorization: 'fsq3L0NQixGnJgQnmdYrIASfNBkYSCB5yWtH5ElKDqbDl/k=',
-  },
-};
-
-fetch(
-  'https://api.foursquare.com/v3/places/search?query=coffee%20shop&ll=29.739113862858495%2C-95.36883114047225',
-  options
-)
-  .then((response) => response.json())
-  .then((response) => console.log(response))
-  .catch((err) => console.error(err));
 
 export default function Home(props) {
   const handleOnBannerBtnClick = () => {
@@ -49,15 +48,18 @@ export default function Home(props) {
         </div>
         {props.coffeeStores && props.coffeeStores.length > 0 && (
           <>
-            <h2 className={styles.heading2}>Toronto stores</h2>
+            <h2 className={styles.heading2}>Houston stores</h2>
             <div className={styles.cardLayout}>
               {props.coffeeStores.map((coffeeStore) => {
                 return (
                   <Card
-                    key={coffeeStore.id}
+                    key={coffeeStore.fsq_id}
                     name={coffeeStore.name}
-                    imgUrl={coffeeStore.imgUrl}
-                    href={`/coffee-store/${coffeeStore.id}`}
+                    imgUrl={
+                      coffeeStore.imgUrl ||
+                      'https://images.unsplash.com/photo-1504753793650-d4a2b783c15e?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=2000&q=80&limit=15'
+                    }
+                    href={`/coffee-store/${coffeeStore.fsq_id}`}
                     className={styles.card}
                   />
                 );
