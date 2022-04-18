@@ -6,7 +6,7 @@ import Card from '../components/card.js';
 import useTrackLocation from '../hooks/use-track-location.js';
 import { fetchCoffeeStores } from '../lib/coffee-stores.js';
 import styles from '../styles/Home.module.css';
-import { ACTION_TYPES, StoreContext } from './_app.js';
+import { ACTION_TYPES, StoreContext } from '../store/store-context';
 
 export async function getStaticProps() {
   const coffeeStores = await fetchCoffeeStores();
@@ -28,7 +28,7 @@ export default function Home(props) {
 
   const fetchedCoffeStores = async () => {
     if (latLong) {
-      const fetchedCoffeeStoresData = await fetchCoffeeStores(latLong, 15);
+      const fetchedCoffeeStoresData = await fetchCoffeeStores(latLong, 30);
       try {
         console.log({ fetchedCoffeeStoresData });
         // setCoffeeStores(fetchedCoffeeStoresData);
@@ -94,7 +94,7 @@ export default function Home(props) {
         )}
         {props.coffeeStores && props.coffeeStores.length > 0 && (
           <div className={styles.sectionWrapper}>
-            <h2 className={styles.heading2}>Houston stores</h2>
+            <h2 className={styles.heading2}>Košice stores</h2>
             <div className={styles.cardLayout}>
               {props.coffeeStores.map((coffeeStore) => {
                 return (
