@@ -9,11 +9,12 @@ import { fetchCoffeeStores } from '../../lib/coffee-stores';
 export async function getStaticProps(staticProps) {
   const params = staticProps.params;
   const coffeeStores = await fetchCoffeeStores();
+  const findCoffeeStoreById = coffeeStores.find((coffeeStore) => {
+    return coffeeStore.fsq_id === params.id;
+  });
   return {
     props: {
-      coffeeStore: coffeeStores.find((coffeeStore) => {
-        return coffeeStore.fsq_id === params.id;
-      }),
+      coffeeStore: findCoffeeStoreById ? findCoffeeStoreById : {},
     },
   };
 }
@@ -55,7 +56,7 @@ const CoffeeStore = (props) => {
         <div className={styles.col1}>
           <div className={styles.backToHomeLink}>
             <Link href='/'>
-              <a>Back to home</a>
+              <a>← Back to home</a>
             </Link>
           </div>
           <div className={styles.nameWrapper}>
@@ -64,7 +65,7 @@ const CoffeeStore = (props) => {
           <Image
             src={
               imgUrl ||
-              'https://images.unsplash.com/photo-1504753793650-d4a2b783c15e?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=2000&q=80'
+              'https://images.unsplash.com/photo-1498804103079-a6351b050096?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=2468&q=80'
             }
             width={600}
             height={360}
@@ -73,14 +74,18 @@ const CoffeeStore = (props) => {
           />
         </div>
         <div className={cls('glass', styles.col2)}>
-          <div className={styles.iconWrapper}>
-            <Image src='/static/icons/location.svg' width='24' height='24' />
-            <p className={styles.text}>{location.address}</p>
-          </div>
-          <div className={styles.iconWrapper}>
-            <Image src='/static/icons/nearMe.svg' width='24' height='24' />
-            <p className={styles.text}>{location.neighborhood}</p>
-          </div>
+          {location && location.address && (
+            <div className={styles.iconWrapper}>
+              <Image src='/static/icons/location.svg' width='24' height='24' />
+              <p className={styles.text}>{location.address}</p>
+            </div>
+          )}
+          {location && location.neighborhood && (
+            <div className={styles.iconWrapper}>
+              <Image src='/static/icons/nearMe.svg' width='24' height='24' />
+              <p className={styles.text}>{location.neighborhood}</p>
+            </div>
+          )}
           <div className={styles.iconWrapper}>
             <Image src='/static/icons/like.svg' width='24' height='24' />
             <p className={styles.text}>1</p>
