@@ -26,32 +26,31 @@ export default function Home(props) {
 
   const { coffeeStores, latLong } = state;
 
-  const fetchedCoffeStores = async () => {
-    if (latLong) {
-      try {
-        const res = await fetch(
-          `/api/getCoffeeStoresByLocation?latLong=${latLong}&limit=30`
-        );
-        console.log({ res });
-        const coffeeStores = await res.json();
-        // setCoffeeStores(fetchedCoffeeStoresData);
-        dispatch({
-          type: ACTION_TYPES.SET_COFFEE_STORES,
-          payload: {
-            coffeeStores,
-          },
-        });
-        setCoffeeStoresError('');
-      } catch (error) {
-        console.log({ error });
-        setCoffeeStoresError(error.message);
-      }
-    }
-  };
-
   useEffect(() => {
+    const fetchedCoffeStores = async () => {
+      if (latLong) {
+        try {
+          const response = await fetch(
+            `/api/getCoffeeStoresByLocation?latLong=${latLong}&limit=30`
+          );
+          console.log({ response });
+          const coffeeStores = await response.json();
+          // setCoffeeStores(fetchedCoffeeStoresData);
+          dispatch({
+            type: ACTION_TYPES.SET_COFFEE_STORES,
+            payload: {
+              coffeeStores,
+            },
+          });
+          setCoffeeStoresError('');
+        } catch (error) {
+          console.log({ error });
+          setCoffeeStoresError(error.message);
+        }
+      }
+    };
     fetchedCoffeStores();
-  }, [latLong]);
+  }, [latLong, dispatch]);
 
   const handleOnBannerBtnClick = () => {
     handleTrackLocation();
