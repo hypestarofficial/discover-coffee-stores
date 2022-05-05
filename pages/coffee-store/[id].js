@@ -52,21 +52,58 @@ const CoffeeStore = (initialProps) => {
     state: { coffeeStores },
   } = useContext(StoreContext);
 
+  const handleCreateCoffeeStore = async (coffeeStore) => {
+    try {
+      const { fsq_id, name, location, imgUrl } = coffeeStore;
+      const response = await fetch('/api/createCoffeeStore', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          id: fsq_id,
+          name,
+          address: location.address || '',
+          neighborhood:
+            (location.neighbourhood &&
+              location.neighbourhood.length > 0 &&
+              location.neighbourhood[0]) ||
+            '',
+          votes: 0,
+          imgUrl,
+        }),
+      });
+      const dbCoffeeStore = response.json();
+      console.log({ dbCoffeeStore });
+    } catch (err) {
+      console.error('Error creating coffee store', err);
+    }
+  };
+
   useEffect(() => {
     if (isEmpty(initialProps.coffeeStore)) {
       if (coffeeStores.length > 0) {
-        const findCoffeeStoreById = coffeeStores.find((coffeeStore) => {
+        const coffeeStoreFromContext = coffeeStores.find((coffeeStore) => {
           return coffeeStore.fsq_id === id;
         });
-        setCoffeeStore(findCoffeeStoreById);
+        if (coffeeStoreFromContext) {
+          setCoffeeStore(coffeeStoreFromContext);
+          handleCreateCoffeeStore(coffeeStoreFromContext);
+        }
       }
+    } else {
+      handleCreateCoffeeStore(initialProps.coffeeStore);
     }
-  }, [id]);
+  }, [id, initialProps, initialProps.coffeeStore]);
 
   const { location, name, imgUrl } = coffeeStore;
 
+  const [votingCount, setVotingCount] = useState(1);
+
   const handleUpvoteButton = () => {
     console.log('handle upvote');
+    let count = votingCount + 1;
+    setVotingCount(count);
   };
 
   return (
@@ -110,7 +147,7 @@ const CoffeeStore = (initialProps) => {
           )}
           <div className={styles.iconWrapper}>
             <Image src='/static/icons/like.svg' width='24' height='24' />
-            <p className={styles.text}>1</p>
+            <p className={styles.text}>{votingCount}</p>
           </div>
           <button className={styles.upvoteButton} onClick={handleUpvoteButton}>
             Up vote!
