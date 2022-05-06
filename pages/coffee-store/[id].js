@@ -1,10 +1,12 @@
-import { useRouter } from 'next/router';
-import { useContext, useEffect, useState } from 'react';
-import Link from 'next/link';
 import Head from 'next/head';
+import Link from 'next/link';
 import Image from 'next/image';
 import styles from '/styles/coffee-store.module.css';
 import cls from 'classnames';
+import useSWR from 'swr';
+
+import { useRouter } from 'next/router';
+import { useContext, useEffect, useState } from 'react';
 import { fetchCoffeeStores } from '../../lib/coffee-stores';
 import { StoreContext } from '../../store/store-context';
 import { isEmpty } from '../../utils';
@@ -100,11 +102,26 @@ const CoffeeStore = (initialProps) => {
 
   const [votingCount, setVotingCount] = useState(1);
 
+  const { data, error } = useSWR(`/api/getCoffeeStoreById?id=${id}`, (url) =>
+    fetch(url).then((res) => res.json())
+  );
+
+  useEffect(() => {
+    if (data && data.length > 0) {
+      console.log('data from SWR', data);
+      setCoffeeStore(data[0]);
+    }
+  }, [data]);
+
   const handleUpvoteButton = () => {
     console.log('handle upvote');
     let count = votingCount + 1;
     setVotingCount(count);
   };
+
+  if (error) {
+    return <div>Something went wrong with retrieving coffee store page</div>;
+  }
 
   return (
     <div className={styles.layout}>
