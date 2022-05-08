@@ -1,6 +1,7 @@
 import Head from 'next/head';
 import Link from 'next/link';
 import Image from 'next/image';
+
 import styles from '/styles/coffee-store.module.css';
 import cls from 'classnames';
 import useSWR from 'swr';
@@ -102,14 +103,22 @@ const CoffeeStore = (initialProps) => {
 
   const [votingCount, setVotingCount] = useState(1);
 
-  const { data, error } = useSWR(`/api/getCoffeeStoreById?id=${id}`, (url) =>
-    fetch(url).then((res) => res.json())
-  );
+  const fetcher = (...args) => fetch(...args).then((res) => res.json());
+
+  const { data, error } = useSWR(`/api/getCoffeeStoreById?id=${id}`, fetcher);
 
   useEffect(() => {
     if (data && data.length > 0) {
+      const coffeeDataFromDb = {
+        location: {
+          address: data[0].address,
+          neighborhood: data[0].neighborhood,
+        },
+        ...data[0],
+      };
       console.log('data from SWR', data);
-      setCoffeeStore(data[0]);
+      setCoffeeStore(coffeeDataFromDb);
+      setVotingCount(data[0].votes);
     }
   }, [data]);
 

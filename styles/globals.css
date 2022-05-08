@@ -6,11 +6,12 @@ body {
     Roboto, Oxygen, Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue,
     sans-serif;
 
-  background: url('/static/background.png');
+  /* background: url('/static/background.png');
 
   background-position: 50%;
   background-repeat: no-repeat;
-  background-size: cover;
+  background-size: cover; */
+  background-color: rgb(255, 111, 111);
   color: #ffffff;
 }
 
@@ -73,15 +74,15 @@ button:focus {
 
 /* glass-morphism */
 .glass {
-  background: rgba(255, 255, 255, 0.3);
+  background: rgba(255, 255, 255, 0.212);
   -webkit-backdrop-filter: blur(4px);
   backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.18);
+  /* border: 1px solid rgba(255, 255, 255, 0.18); */
 }
 
 .glass:hover {
   background: hsla(0, 0%, 100%, 0.4);
-  border: 1px solid rgba(255, 255, 255, 0.459);
+  /* border: 1px solid rgba(255, 255, 255, 0.459); */
 }
 
 :root {

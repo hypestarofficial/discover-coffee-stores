@@ -1,11 +1,13 @@
 import Head from 'next/head';
 import Image from 'next/image';
-import { useEffect, useContext, useState } from 'react';
 import Banner from '../components/banner.js';
 import Card from '../components/card.js';
+
 import useTrackLocation from '../hooks/use-track-location.js';
-import { fetchCoffeeStores } from '../lib/coffee-stores.js';
 import styles from '../styles/Home.module.css';
+
+import { useEffect, useContext, useState } from 'react';
+import { fetchCoffeeStores } from '../lib/coffee-stores.js';
 import { ACTION_TYPES, StoreContext } from '../store/store-context';
 
 export async function getStaticProps() {
