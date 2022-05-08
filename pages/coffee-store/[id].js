@@ -16,7 +16,7 @@ export async function getStaticProps(staticProps) {
   const params = staticProps.params;
   const coffeeStores = await fetchCoffeeStores();
   const findCoffeeStoreById = coffeeStores.find((coffeeStore) => {
-    return coffeeStore.fsq_id === params.id;
+    return coffeeStore.id.toString() === params.id;
   });
   return {
     props: {
@@ -30,7 +30,7 @@ export async function getStaticPaths() {
   const paths = coffeeStores.map((coffeeStore) => {
     return {
       params: {
-        id: coffeeStore.fsq_id,
+        id: coffeeStore.id,
       },
     };
   });
@@ -55,21 +55,17 @@ const CoffeeStore = (initialProps) => {
 
   const handleCreateCoffeeStore = async (coffeeStore) => {
     try {
-      const { fsq_id, name, location, imgUrl } = coffeeStore;
+      const { id, name, neighborhood, address, imgUrl } = coffeeStore;
       const response = await fetch('/api/createCoffeeStore', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          id: fsq_id,
+          id,
           name,
-          address: location.address || '',
-          neighborhood:
-            (location.neighbourhood &&
-              location.neighbourhood.length > 0 &&
-              location.neighbourhood[0]) ||
-            '',
+          address: address || '',
+          neighborhood: neighborhood || '',
           votes: 0,
           imgUrl,
         }),
@@ -84,7 +80,7 @@ const CoffeeStore = (initialProps) => {
     if (isEmpty(initialProps.coffeeStore)) {
       if (coffeeStores.length > 0) {
         const coffeeStoreFromContext = coffeeStores.find((coffeeStore) => {
-          return coffeeStore.fsq_id === id;
+          return coffeeStore.id.toString() === id;
         });
         if (coffeeStoreFromContext) {
           setCoffeeStore(coffeeStoreFromContext);
@@ -96,7 +92,7 @@ const CoffeeStore = (initialProps) => {
     }
   }, [id, initialProps, initialProps.coffeeStore, coffeeStores]);
 
-  const { location, name, imgUrl } = coffeeStore;
+  const { address, neighborhood, name, imgUrl } = coffeeStore;
 
   const [votingCount, setVotingCount] = useState(0);
 
@@ -170,7 +166,7 @@ const CoffeeStore = (initialProps) => {
           />
         </div>
         <div className={cls('glass', styles.col2)}>
-          {location && location.address && (
+          {address && (
             <div className={styles.iconWrapper}>
               <Image
                 src='/static/icons/location.svg'
@@ -178,10 +174,10 @@ const CoffeeStore = (initialProps) => {
                 width='24'
                 height='24'
               />
-              <p className={styles.text}>{location.address}</p>
+              <p className={styles.text}>{address}</p>
             </div>
           )}
-          {location && location.neighborhood && (
+          {neighborhood && (
             <div className={styles.iconWrapper}>
               <Image
                 src='/static/icons/nearMe.svg'
@@ -189,7 +185,7 @@ const CoffeeStore = (initialProps) => {
                 width='24'
                 height='24'
               />
-              <p className={styles.text}>{location.neighborhood}</p>
+              <p className={styles.text}>{neighborhood}</p>
             </div>
           )}
           <div className={styles.iconWrapper}>
