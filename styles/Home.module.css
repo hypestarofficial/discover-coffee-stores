@@ -68,7 +68,7 @@
 
 @media (max-width: 640px) {
   .heroImage {
-    right: -50%;
+    display: none;
   }
 }
 
