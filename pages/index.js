@@ -72,7 +72,7 @@ export default function Home(props) {
         {coffeeStoresError && <p>Something went wrong: {coffeeStoresError}</p>}
         <div className={styles.heroImage}>
           <Image
-            src='/static/hero-image.svg'
+            src='/static/hero-image.png'
             alt='Coffe Finder banner'
             width={700}
             height={400}
