@@ -1,7 +1,7 @@
 import Head from 'next/head';
 import Image from 'next/image';
-import Banner from '../components/banner.js';
-import Card from '../components/card.js';
+import Banner from '../components/banner/banner.js';
+import Card from '../components/card/card.js';
 
 import useTrackLocation from '../hooks/use-track-location.js';
 import styles from '../styles/Home.module.css';
