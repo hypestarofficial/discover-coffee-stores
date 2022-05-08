@@ -6,11 +6,11 @@ import styles from '/styles/coffee-store.module.css';
 import cls from 'classnames';
 import useSWR from 'swr';
 
-import { useRouter } from 'next/router';
 import { useContext, useEffect, useState } from 'react';
+import { useRouter } from 'next/router';
 import { fetchCoffeeStores } from '../../lib/coffee-stores';
 import { StoreContext } from '../../store/store-context';
-import { isEmpty } from '../../utils';
+import { fetcher, isEmpty } from '../../utils';
 
 export async function getStaticProps(staticProps) {
   const params = staticProps.params;
@@ -43,13 +43,11 @@ export async function getStaticPaths() {
 const CoffeeStore = (initialProps) => {
   const router = useRouter();
 
-  if (router.isFallback) {
-    return <div>Loading...</div>;
-  }
-
   const id = router.query.id;
 
-  const [coffeeStore, setCoffeeStore] = useState(initialProps.coffeeStore);
+  const [coffeeStore, setCoffeeStore] = useState(
+    initialProps.coffeeStore || {}
+  );
 
   const {
     state: { coffeeStores },
@@ -77,7 +75,6 @@ const CoffeeStore = (initialProps) => {
         }),
       });
       const dbCoffeeStore = response.json();
-      console.log({ dbCoffeeStore });
     } catch (err) {
       console.error('Error creating coffee store', err);
     }
@@ -97,13 +94,11 @@ const CoffeeStore = (initialProps) => {
     } else {
       handleCreateCoffeeStore(initialProps.coffeeStore);
     }
-  }, [id, initialProps, initialProps.coffeeStore]);
+  }, [id, initialProps, initialProps.coffeeStore, coffeeStores]);
 
   const { location, name, imgUrl } = coffeeStore;
 
-  const [votingCount, setVotingCount] = useState(1);
-
-  const fetcher = (...args) => fetch(...args).then((res) => res.json());
+  const [votingCount, setVotingCount] = useState(0);
 
   const { data, error } = useSWR(`/api/getCoffeeStoreById?id=${id}`, fetcher);
 
@@ -116,16 +111,32 @@ const CoffeeStore = (initialProps) => {
         },
         ...data[0],
       };
-      console.log('data from SWR', data);
       setCoffeeStore(coffeeDataFromDb);
       setVotingCount(data[0].votes);
     }
   }, [data]);
 
-  const handleUpvoteButton = () => {
-    console.log('handle upvote');
-    let count = votingCount + 1;
-    setVotingCount(count);
+  const handleUpvoteButton = async () => {
+    try {
+      const response = await fetch('/api/upvoteCoffeeStoreById', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          id,
+        }),
+      });
+
+      const dbCoffeeStore = await response.json();
+
+      if (dbCoffeeStore && dbCoffeeStore.length > 0) {
+        let count = votingCount + 1;
+        setVotingCount(count);
+      }
+    } catch (err) {
+      console.error('Error upvoting the coffee store', err);
+    }
   };
 
   if (error) {
@@ -161,18 +172,33 @@ const CoffeeStore = (initialProps) => {
         <div className={cls('glass', styles.col2)}>
           {location && location.address && (
             <div className={styles.iconWrapper}>
-              <Image src='/static/icons/location.svg' width='24' height='24' />
+              <Image
+                src='/static/icons/location.svg'
+                alt='Image of a coffee store'
+                width='24'
+                height='24'
+              />
               <p className={styles.text}>{location.address}</p>
             </div>
           )}
           {location && location.neighborhood && (
             <div className={styles.iconWrapper}>
-              <Image src='/static/icons/nearMe.svg' width='24' height='24' />
+              <Image
+                src='/static/icons/nearMe.svg'
+                alt='Image of a coffee store'
+                width='24'
+                height='24'
+              />
               <p className={styles.text}>{location.neighborhood}</p>
             </div>
           )}
           <div className={styles.iconWrapper}>
-            <Image src='/static/icons/like.svg' width='24' height='24' />
+            <Image
+              src='/static/icons/like.svg'
+              alt='Image of a coffee store'
+              width='24'
+              height='24'
+            />
             <p className={styles.text}>{votingCount}</p>
           </div>
           <button className={styles.upvoteButton} onClick={handleUpvoteButton}>

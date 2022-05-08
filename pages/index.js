@@ -10,7 +10,7 @@ import { useEffect, useContext, useState } from 'react';
 import { fetchCoffeeStores } from '../lib/coffee-stores.js';
 import { ACTION_TYPES, StoreContext } from '../store/store-context';
 
-export async function getStaticProps() {
+export async function getStaticProps(context) {
   const coffeeStores = await fetchCoffeeStores();
   return {
     props: { coffeeStores },
@@ -21,7 +21,6 @@ export default function Home(props) {
   const { handleTrackLocation, locationError, isFindingLocation } =
     useTrackLocation();
 
-  // const [coffeeStores, setCoffeeStores] = useState('');
   const [coffeeStoresError, setCoffeeStoresError] = useState(null);
 
   const { dispatch, state } = useContext(StoreContext);
@@ -29,16 +28,14 @@ export default function Home(props) {
   const { coffeeStores, latLong } = state;
 
   useEffect(() => {
-    const fetchedCoffeStores = async () => {
+    const setCoffeeStoresByLocation = async () => {
       if (latLong) {
         try {
           const response = await fetch(
-            `/api/getCoffeeStoresByLocation?latLong=${latLong}&limit=30`
+            `/api/getCoffeeStoresByLocation?latLong=${latLong}&limit=30&radius=5000`
           );
-          console.log({ latLong });
-          console.log({ response });
           const coffeeStores = await response.json();
-          // setCoffeeStores(fetchedCoffeeStoresData);
+          console.log({ coffeeStores });
           dispatch({
             type: ACTION_TYPES.SET_COFFEE_STORES,
             payload: {
@@ -52,7 +49,7 @@ export default function Home(props) {
         }
       }
     };
-    fetchedCoffeStores();
+    setCoffeeStoresByLocation();
   }, [latLong, dispatch]);
 
   const handleOnBannerBtnClick = () => {
@@ -75,7 +72,12 @@ export default function Home(props) {
         {locationError && <p>Something went wrong: {locationError}</p>}
         {coffeeStoresError && <p>Something went wrong: {coffeeStoresError}</p>}
         <div className={styles.heroImage}>
-          <Image src='/static/hero-image.svg' width={700} height={400} />
+          <Image
+            src='/static/hero-image.svg'
+            alt='Coffe Finder banner'
+            width={700}
+            height={400}
+          />
         </div>
         {coffeeStores && coffeeStores.length > 0 && (
           <div className={styles.sectionWrapper}>
