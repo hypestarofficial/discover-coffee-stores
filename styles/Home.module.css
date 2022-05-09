@@ -53,11 +53,6 @@
     padding-right: 1.5rem;
   }
 
-  .heroImage {
-    right: -30%;
-    scale: 75%;
-  }
-
   .cardLayout {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
